@@ -9,7 +9,11 @@ def index():
 
 @app.route('/genre')
 def genre():
-    return render_template('genre.html', active_page="genre")
+    return render_template(
+        'genre.html',
+        active_page="genre",
+        movie_df=pd.read_csv("static/data/top10_by_genre.csv")
+    )
 
 @app.route('/rating')
 def rating():

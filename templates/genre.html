@@ -2,12 +2,43 @@
 {% block content %}
 <h2>Genre</h2>
 <div>
-  <p>This site is Project 4 for STAT 542 from the University of Illinois at Urbana-Champaign. It uses the MovieLens dataset to make recommendations either based on a selected genre, or from rating several movies. You can use the navigation bar above, or select either of the following:</p>
-
-  <a href="/genre"><h3>Genre</h3></a>
-  <p>Select a genre and get movie recommendations.</p>
-
-  <a href="/rating"><h3>Rating</h3></a>
-  <p>Rate a collection of movies and get customized recommendations.</p>
+  <p>Select a film genre and we will recommend 10 movies.</p>
+  <div class="dropdown">
+    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      Select Genre
+    </button>
+    <div id="genre-select-dropdown" class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+      {% for genre in movie_df.genre.unique() %}
+        <a class="dropdown-item" href="#" genre="{{ genre }}">{{ genre }}</a>
+      {% endfor %}
+    </div>
+  </div>
+  <div>
+    {% for genre in movie_df.genre.unique() %}
+      <div id="genre-reco-{{ genre }}" class="genre-reco d-none">
+        <h3>{{ genre }}</h3>
+        <table>
+          <thead>
+            <th scope="col">#</th>
+            <th scope="col">Title</th>
+            <th scope="col">Genres</th>
+            <th scope="col">Average Rating</th>
+            <th scope="col">Reviews</th>
+          </thead>
+          <tbody>
+          {% for index, row in movie_df[movie_df.genre == genre].sort_values('post_mean', ascending=False).iterrows() %}
+            <tr>
+              <th scope="row">{{ index + 1 }}</th>
+              <td>{{ row.title }}</td>
+              <td>{{ row.genres }}</td>
+              <td>{{ (row.rating_sum / row.review_num)|round(2) }}</td>
+              <td>{{ row.review_num }}</td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% endfor %}
+  </div>
 </div>
 {% endblock %}
