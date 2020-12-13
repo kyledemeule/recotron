@@ -81,8 +81,10 @@
             }
             $.post("/rating/recommendation", post_data)
               .done(function(response) {
-                console.log(response);
                 $('#recommendations').append(response);
+              })
+              .fail(function() {
+                $('#recommendations').append("<h3>Error</h3><p>Something went wrong, please refresh the page and try again.</p>");
               })
               .always(function() {
                 $("#reco-form :input").prop("disabled", false);

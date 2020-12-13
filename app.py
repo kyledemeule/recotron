@@ -96,6 +96,11 @@ def rating_recommendation():
         in movie_rating_matrix_centered
     ])
     movie_rating_matrix_centered = None # allow GC if memory is short
+    # if they didn't rank anything or ranked everything the same
+    # then their weights will all be nan. replace this with uniform
+    is_all_nan = np.isnan(np.sum(new_user_weights))
+    if(is_all_nan):
+        new_user_weights.fill(1)
     # calculate rankings
     m_p0 = np.load('static/data/movie_estimate_matrix_centered-0.npy')
     m_p1 = np.load('static/data/movie_estimate_matrix_centered-1.npy')
@@ -106,6 +111,9 @@ def rating_recommendation():
     sorted_movies = list(np.argsort(n_est))
     # argsort sorts in ascending order
     sorted_movies.reverse()
+    # remove movies they've already rated
+    rated_movies = set(map(lambda x: movie_lookup[int(x)], movie_ids))
+    sorted_movies = [x for x in sorted_movies if x not in rated_movies]
     movie_recs = [movie_rev_lookup[m_id] for m_id in sorted_movies]
     return render_template('recommendation-result.html',
         reco_movies_df=movie_df.loc[movie_recs[:10]]
