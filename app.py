@@ -86,7 +86,10 @@ def rating_recommendation():
         new_user_rating[movie_lookup[int(movie_id)]] = float(movie_rating)
     new_user_rating_centered = center_vector(new_user_rating)
     # calculate new user weights
-    movie_rating_matrix_centered = np.load('static/data/movie_rating_matrix_centered.npy')
+    m_p0 = np.load('static/data/movie_rating_matrix_centered-0.npy')
+    m_p1 = np.load('static/data/movie_rating_matrix_centered-1.npy')
+    movie_rating_matrix_centered = np.concatenate((m_p0, m_p1))
+    m_p0, m_p1 = None, None
     new_user_weights = np.array([
         centered_cosine_similarity(new_user_rating_centered, user_vector)
         for user_vector
@@ -94,7 +97,10 @@ def rating_recommendation():
     ])
     movie_rating_matrix_centered = None # allow GC if memory is short
     # calculate rankings
-    movie_estimate_matrix_centered = np.load('static/data/movie_estimate_matrix_centered.npy')
+    m_p0 = np.load('static/data/movie_estimate_matrix_centered-0.npy')
+    m_p1 = np.load('static/data/movie_estimate_matrix_centered-1.npy')
+    movie_estimate_matrix_centered = np.concatenate((m_p0, m_p1))
+    m_p0, m_p1 = None, None
     n_est = (movie_estimate_matrix_centered.T * new_user_weights).T
     n_est = n_est.sum(axis=0)
     sorted_movies = list(np.argsort(n_est))
