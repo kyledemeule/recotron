@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify, render_template
 import pandas as pd
+import numpy as np
 
 app = Flask(__name__)
 
@@ -45,9 +46,24 @@ def rating():
         sample_movies=sample_movies
     )
 
+def center_vector(v):
+    v_copy = v.copy()
+    v_mean = v.sum() / (v != 0).sum()
+    for v_i, val in enumerate(v):
+        if val != 0:
+            v_copy[v_i] = val - v_mean
+    return(v_copy)
+
+def centered_cosine_similarity(v1, v2):
+    if np.linalg.norm(v2) == 0:
+        return 0
+    return np.matmul(v1.T, v2) / (np.linalg.norm(v1) * np.linalg.norm(v2))
+
 @app.route('/rating/recommendation', methods=['POST'])
 def rating_recommendation():
-    print(request.form)
+    movie_ids = request.form.getlist("movie_ids[]")
+    movie_ratings = request.form.getlist("movie_ratings[]")
+    # read in the movie list
     movie_df = pd.read_csv(
         "static/data/movies.dat",
         sep="::",
@@ -55,8 +71,38 @@ def rating_recommendation():
         index_col=0,
         engine="python"
     )
+    # generate movie lookup
+    movie_lookup = {}
+    movie_rev_lookup = {}
+    i = 0
+    for index, row in movie_df.iterrows():
+        movie_lookup[index] = i
+        movie_rev_lookup[i] = index
+        i += 1
+    n_movies = len(movie_lookup)
+    # generate new user vector
+    new_user_rating = np.zeros(n_movies)
+    for movie_id, movie_rating in zip(movie_ids, movie_ratings):
+        new_user_rating[movie_lookup[int(movie_id)]] = float(movie_rating)
+    new_user_rating_centered = center_vector(new_user_rating)
+    # calculate new user weights
+    movie_rating_matrix_centered = np.load('static/data/movie_rating_matrix_centered.npy')
+    new_user_weights = np.array([
+        centered_cosine_similarity(new_user_rating_centered, user_vector)
+        for user_vector
+        in movie_rating_matrix_centered
+    ])
+    movie_rating_matrix_centered = None # allow GC if memory is short
+    # calculate rankings
+    movie_estimate_matrix_centered = np.load('static/data/movie_estimate_matrix_centered.npy')
+    n_est = (movie_estimate_matrix_centered.T * new_user_weights).T
+    n_est = n_est.sum(axis=0)
+    sorted_movies = list(np.argsort(n_est))
+    # argsort sorts in ascending order
+    sorted_movies.reverse()
+    movie_recs = [movie_rev_lookup[m_id] for m_id in sorted_movies]
     return render_template('recommendation-result.html',
-        reco_movies_df=movie_df.head()
+        reco_movies_df=movie_df.loc[movie_recs[:10]]
     )
 
 if __name__ == '__main__':

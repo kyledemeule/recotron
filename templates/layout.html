@@ -61,16 +61,25 @@
             $("#reco-form :input").prop("disabled", true);
 
             var ratings = {};
+            var movie_ids = [];
+            var movie_ratings = [];
             var possible_scores = ["1", "2", "3", "4", "5"];
             $( "#reco-form  select" ).each(function( index ) {
               var rating = $(this).val();
               if (possible_scores.includes(rating)) {
                 var movie_id = $(this).attr('id');
                 ratings[movie_id] = rating;
+                movie_ids.push(movie_id);
+                movie_ratings.push(rating);
               }
             });
 
-            $.post("/rating/recommendation", ratings)
+
+            var post_data = {
+              "movie_ids": movie_ids,
+              "movie_ratings": movie_ratings
+            }
+            $.post("/rating/recommendation", post_data)
               .done(function(response) {
                 console.log(response);
                 $('#recommendations').append(response);
