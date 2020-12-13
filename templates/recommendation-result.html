@@ -1,0 +1,17 @@
+<h3>Recommendations</h3>
+<table>
+  <thead>
+    <th scope="col">#</th>
+    <th scope="col">Title</th>
+    <th scope="col">Genres</th>
+  </thead>
+  <tbody>
+  {% for index, row in reco_movies_df.iterrows() %}
+    <tr>
+      <th scope="row">{{ index + 1 }}</th>
+      <td>{{ row.title }}</td>
+      <td>{{ row.genres }}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>

@@ -52,6 +52,33 @@
               $('.genre-reco').addClass('d-none');
               $('#genre-reco-' + selected_genre).removeClass('d-none');
           });
+          // recommendation logic
+          $( "#reco-form" ).submit(function( event ) {
+            event.preventDefault();
+            $('#recommendations').empty();
+
+
+            $("#reco-form :input").prop("disabled", true);
+
+            var ratings = {};
+            var possible_scores = ["1", "2", "3", "4", "5"];
+            $( "#reco-form  select" ).each(function( index ) {
+              var rating = $(this).val();
+              if (possible_scores.includes(rating)) {
+                var movie_id = $(this).attr('id');
+                ratings[movie_id] = rating;
+              }
+            });
+
+            $.post("/rating/recommendation", ratings)
+              .done(function(response) {
+                console.log(response);
+                $('#recommendations').append(response);
+              })
+              .always(function() {
+                $("#reco-form :input").prop("disabled", false);
+              });
+        });
       });
     </script>
   </body>

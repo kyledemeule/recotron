@@ -2,12 +2,27 @@
 {% block content %}
 <h2>Rating</h2>
 <div>
-  <p>This site is Project 4 for STAT 542 from the University of Illinois at Urbana-Champaign. It uses the MovieLens dataset to make recommendations either based on a selected genre, or from rating several movies. You can use the navigation bar above, or select either of the following:</p>
-
-  <a href="/genre"><h3>Genre</h3></a>
-  <p>Select a genre and get movie recommendations.</p>
-
-  <a href="/rating"><h3>Rating</h3></a>
-  <p>Rate a collection of movies and get customized recommendations.</p>
+  <p>Provide your rating for some of the following movies, and then press generate recommendations to get your customized recommendations.</p>
+  <form id="reco-form">
+    <table>
+        {% for movie_id, movie_title in sample_movies %}
+        <tr>
+            <td>{{ movie_title }}</td>
+            <td>
+                <select class="browser-default custom-select" id={{ movie_id }}>
+                  <option selected>No Rating</option>
+                  <option value="1">1</option>
+                  <option value="2">2</option>
+                  <option value="3">3</option>
+                  <option value="4">4</option>
+                  <option value="5">5</option>
+                </select>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    <button id="reco-form-submit" type="submit" class="btn btn-primary">Generate Recommendation</button>
+  </form>
 </div>
+<div id="recommendations"></div>
 {% endblock %}
