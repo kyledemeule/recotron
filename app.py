@@ -119,6 +119,10 @@ def rating_recommendation():
         reco_movies_df=movie_df.loc[movie_recs[:10]]
     )
 
+@app.template_filter('remove_apos')
+def remove_apos(text):
+    return text.replace("'", "")
+
 if __name__ == '__main__':
     # Threaded option to enable multiple instances for multiple user access support
     app.run(threaded=True, port=5000)

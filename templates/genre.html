@@ -9,13 +9,13 @@
     </button>
     <div id="genre-select-dropdown" class="dropdown-menu" aria-labelledby="dropdownMenuButton">
       {% for genre in movie_df.genre.unique() %}
-        <a class="dropdown-item" href="#" genre="{{ genre }}">{{ genre }}</a>
+        <a class="dropdown-item" href="#" genre="{{ genre | remove_apos }}">{{ genre }}</a>
       {% endfor %}
     </div>
   </div>
   <div>
     {% for genre in movie_df.genre.unique() %}
-      <div id="genre-reco-{{ genre }}" class="genre-reco d-none">
+      <div id="genre-reco-{{ genre | remove_apos }}" class="genre-reco d-none">
         <h3>{{ genre }}</h3>
         <table>
           <thead>
