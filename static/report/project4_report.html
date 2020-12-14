@@ -15955,7 +15955,7 @@ Test time         1.32    1.33    0.94    1.32    0.94    1.36    1.34    0.95  
 </div>
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>We can now multiple each row of our estimate matrix by these weights, sum the columns, and get our estimated score for each movie:</p>
+<p>We can now multiply each row of our estimate matrix by these weights, sum the columns, and get our estimated score for each movie:</p>
 
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
@@ -16053,7 +16053,7 @@ Wrong Trousers, The (1993)
 </div>
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>This list is very similar to our bayesian fit above (for any genre), which is good. The benefit to this particular approach is that we can now adjust the per-user weights based on a new users ratings, so let's try that now. Let's pretend we have a new user that is a fan of children movies like Toy Story, and disliked crime movies like the Godfather and The usual suspects:</p>
+<p>This list is very similar to our bayesian fit above (for any genre), which is good. The benefit to this particular approach is that we can now adjust the per-user weights based on a new users ratings, so let's try that now. Let's pretend we have a new user that is a fan of children movies like Toy Story, and disliked crime movies like the Godfather and The Usual Suspects. First we'll need a matrix of all users rankings that is centered.</p>
 
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
@@ -16097,7 +16097,7 @@ Wrong Trousers, The (1993)
 </div>
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>We'll need to calculate the similarity of our new users recommendations to every user in the dataset. To do this I'll use Pearsons correlation (aka centered cosine similarity). I'll define two help functions to do this:</p>
+<p>Now we'll need to calculate the similarity of our new users recommendations to every user in the dataset. To do this I'll use Pearsons correlation (aka centered cosine similarity). I'll define two help functions to do this:</p>
 
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
@@ -16197,7 +16197,7 @@ Wrong Trousers, The (1993)
 </div>
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>We'll also want to center the estimate matrix. If a weight is positive that means that users preference is positively correlated with our new user. Any positive ratings after centering would be preferred. It also has the benefit of lowering the score for ratings from users the new user has a negative correlation with, which should better use all possible review estimates. If a user has no correlation with a particular user (which would happen if they didn't review any of the same movies), then their weight would be around 0 and those estimated reviews will have no impact on our recommendations. We can now use these weights to score each movie in the dataset, and then get the top 10 for this particular user:</p>
+<p>If a weight is positive that means that users preference is positively correlated with our new user. If we take the estimate matrix and center it, then positive estimates for users we correlate with will increase a movies ranking. Inversely if the new user negatively correlates with a particular movie, then movies they disliked will be increased. If a user has no correlation with a particular user (which would happen if they didn't review any of the same movies), then their weight would be around 0 and those estimated reviews will have no impact on our recommendations. We can now use these weights to score each movie in the dataset, and then get the top 10 for this particular user:</p>
 
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
@@ -16271,7 +16271,7 @@ Baby Geniuses (1999)
 </div>
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>This list looks appropriate for pur hypothetical user, i.e. it contains mostly childrens movies and no crime or adult themed movies. We were also able to make this change from only 4 reviews from the user, which would be ideal for our web application.</p>
+<p>This list looks appropriate for pur hypothetical user, i.e. it contains mostly childrens movies and no crime or adult themed movies. We were also able to generate this list from only 4 reviews from the user, which would be ideal for our web application (since then we don't have to ask the user to review many movies before making a recommendation).</p>
 <p>We can also try flipping those ratings - i.e. if we liked crime movies but disliked children's movies:</p>
 
 </div>
@@ -16351,7 +16351,7 @@ Shawshank Redemption, The (1994)
 </div>
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>It looks like by using the two matrices (movie estimates, centered rankings) we should be able to quickly make new recommendations, so we'll save those two to files. Each matrix is around 187MB in size, and github wereI'm hosting this has a 100MB file size limit, so I've split each into two files. They are saved like this:</p>
+<p>It looks like by using the two matrices (movie estimates, centered rankings) we should be able to quickly make new recommendations (this code takes &lt; 1 second on my computer, and &lt; 10 seconds on the web server), so we'll save those two to files. Each matrix is around 187MB in size, and github (where I'm hosting the code/site) has a 100MB file size limit, so I've split each into two files. They are saved like this:</p>
 
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
@@ -16379,7 +16379,7 @@ Shawshank Redemption, The (1994)
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
 <h2 id="Web-App">Web App<a class="anchor-link" href="#Web-App">&#182;</a></h2><p>The final component to this project is a web application that allows users to get movie recommendations based on their genre preference or based on a series of movie ratings. To build this website I will be using the <a href="https://flask.palletsprojects.com/en/1.1.x/">Flask</a> python framework, and deploying it on <a href="https://www.heroku.com/">Heroku</a>.</p>
-<p>The system I recommendations can be entirely pre-computed (i.e. create a top-10 list for each genre and save that), which I can save as a CSV file that is read and rendered to HTML each time the user requests the website. Let's generate the top movied for each genre and save it as a CSV:</p>
+<p>The system I recommendations can be entirely pre-computed (i.e. create a top-10 list for each genre and save that), which I can save as a CSV file that is read and rendered to HTML each time the user requests the website. Let's generate the top movies for each genre and save it as a CSV:</p>
 
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
@@ -16610,8 +16610,8 @@ Shawshank Redemption, The (1994)
 </div>
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>This CSV file can now be stored with the web application. It can load it ang generate HTML that shows the list, and use Javascript to show/hide each genre based on the user selection. This can be seen at <a href="https://recotron.herokuapp.com/">recotron.herokuapp.com</a>.</p>
-<p>Next is this recommendation based on the users ratings. We did do this above, but I'll include all the relevant code to do that here (other than the movie lookup, which can be retrieved directly from the input file.</p>
+<p>This CSV file can now be stored with the web application. The site can load it and generate HTML that shows the list, and use Javascript to show/hide each genre based on the user selection. This can be seen at <a href="https://recotron.herokuapp.com/">recotron.herokuapp.com</a>.</p>
+<p>Next is the recommendation based on the users ratings. The code above showed how this can be done, but I'll include all the relevant code to do that here (other than the movie lookup, which can be retrieved directly from the input file).</p>
 
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
@@ -16768,7 +16768,17 @@ Schindler&#39;s List (1993)
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
 <p>Just one note that I had sampled this list multiple times when developing the application so the list on the web application is different, but this was the process that was used to generate it.</p>
-<p>The source code for the web application is available at <a href="https://github.com/kyledemeule/recotron">https://github.com/kyledemeule/recotron</a>.</p>
+<p>The source code for the web application is available at <a href="https://github.com/kyledemeule/recotron">https://github.com/kyledemeule/recotron</a>. The most relevant or interesting files would be:</p>
+<ul>
+<li><a href="https://github.com/kyledemeule/recotron/blob/master/app.py">app.py</a><ul>
+<li>Code for all the endpoints, including the recommendation endpoint <a href="https://github.com/kyledemeule/recotron/blob/master/app.py#L62">/rating/recommendation</a></li>
+</ul>
+</li>
+<li><a href="https://github.com/kyledemeule/recotron/blob/master/templates/layout.html">layout.html</a><ul>
+<li>Base HTML as well as javascript that reads user input and gets recommendations from server.</li>
+</ul>
+</li>
+</ul>
 
 </div>
 </div>
