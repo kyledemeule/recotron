@@ -57,6 +57,7 @@
           $( "#reco-form" ).submit(function( event ) {
             event.preventDefault();
             $('#recommendations').empty();
+            $('#recommendations').append("<p>Loading <img src='{{ url_for('static', filename='images/loading.gif') }}' /></p>");
 
 
             $("#reco-form :input").prop("disabled", true);
@@ -82,9 +83,11 @@
             }
             $.post("/rating/recommendation", post_data)
               .done(function(response) {
+                $('#recommendations').empty();
                 $('#recommendations').append(response);
               })
               .fail(function() {
+                $('#recommendations').empty();
                 $('#recommendations').append("<h3>Error</h3><p>Something went wrong, please refresh the page and try again.</p>");
               })
               .always(function() {
